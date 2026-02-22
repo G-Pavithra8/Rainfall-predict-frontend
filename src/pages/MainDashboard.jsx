@@ -21,7 +21,7 @@ function MainDashboard() {
       const response = await fetchPredictions(request);
       setData(response);
     } catch (err) {
-      setError('Please ensure your prediction server is running at http://127.0.0.1:5000 and try again.');
+      setError('Please ensure your prediction server is running at https://rainfall-predict-backend.onrender.com and try again.');
     } finally {
       setLoading(false);
     }

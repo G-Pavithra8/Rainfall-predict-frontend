@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const API_ENDPOINT = 'http://127.0.0.1:5000/predict';
+const API_BASE_URL = "https://rainfall-predict-backend.onrender.com";
 
 export const fetchPredictions = async (data) => {
   try {
-    const response = await axios.post(API_ENDPOINT, data);
+    const response = await axios.post(`${API_BASE_URL}/predict`, data);
     return response.data;
   } catch (error) {
     console.error('Error fetching prediction data:', error);
