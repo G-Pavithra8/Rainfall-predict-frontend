@@ -9,12 +9,6 @@ const TopNav = ({ onLogout }) => {
     navigate('/about');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('userEmail');
-    setShowPopup(false);
-    navigate('/login');
-  };
-
   return (
     <nav className="w-full bg-[#1E293B] px-4 py-3 flex items-center justify-between shadow-md">
       <span className="text-2xl font-bold text-[#10B981]">RainPredict</span>
@@ -32,6 +26,7 @@ const TopNav = ({ onLogout }) => {
           Logout
         </button>
       </div>
+
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
           <div className="bg-white p-6 rounded shadow-lg text-center">
