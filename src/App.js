@@ -18,6 +18,19 @@ function App() {
     return () => window.removeEventListener('storage', onStorage);
   }, []);
 
+useEffect(() => {
+  const wakeServer = async () => {
+    try {
+      await fetch("https://rainfall-predict-backend.onrender.com");
+      console.log("Server is awake");
+    } catch (error) {
+      console.log("Server sleeping... retrying in 5 sec");
+      setTimeout(wakeServer, 5000);
+    }
+  };
+
+  wakeServer();
+}, []);
   // Pass these handlers to children
   const handleLogin = (email) => {
     localStorage.setItem('userEmail', email);

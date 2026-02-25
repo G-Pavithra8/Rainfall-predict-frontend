@@ -2,7 +2,14 @@ import React from 'react';
 import { MapPin, ArrowUpRight } from 'lucide-react';
 
 const LocationDisplay = ({ location }) => {
+
+  // ✅ Prevent crash if location not loaded yet
+  if (!location || !location.coordinates) {
+    return null;   // or return <p>Loading location...</p>;
+  }
+
   const { name, country, coordinates } = location;
+
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${coordinates.latitude},${coordinates.longitude}`;
 
   return (
@@ -31,4 +38,4 @@ const LocationDisplay = ({ location }) => {
   );
 };
 
-export default LocationDisplay; 
+export default LocationDisplay;

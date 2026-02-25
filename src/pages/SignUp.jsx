@@ -5,35 +5,59 @@ const Signup = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
+    setLoading(true);
+
     try {
-      const response = await fetch("https://rainfall-predict-backend.onrender.com/signup", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+      const response = await fetch(
+        "https://rainfall-predict-backend.onrender.com/signup",
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        }
+      );
+
+      // If backend sleeping or not ready
+      if (!response.ok) {
+        throw new Error("Server not ready");
+      }
+
       const data = await response.json();
+
       if (data.success) {
-        onLogin(email); // Automatically log in and redirect after signup
+        onLogin(email); // Auto login after signup
       } else {
         setError(data.message || 'Sign up failed.');
       }
+
     } catch (err) {
-      setError('Server error. Please try again later.');
+      setError(
+        "⚠ Server is starting up. Please wait 20–30 seconds and try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0F172A]">
-      <form onSubmit={handleSubmit} className="bg-[#1E293B] p-8 rounded-xl shadow-lg w-full max-w-sm">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-[#1E293B] p-8 rounded-xl shadow-lg w-full max-w-sm"
+      >
         <h2 className="text-2xl font-bold text-white mb-6">Sign Up</h2>
-        {error && <div className="text-red-400 mb-2">{error}</div>}
-        {success && <div className="text-green-400 mb-2">{success}</div>}
+
+        {error && (
+          <div className="text-yellow-400 mb-4 text-sm">
+            {error}
+          </div>
+        )}
+
         <input
           type="email"
           placeholder="Email"
@@ -42,6 +66,7 @@ const Signup = ({ onLogin }) => {
           onChange={e => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           placeholder="Password"
@@ -50,11 +75,20 @@ const Signup = ({ onLogin }) => {
           onChange={e => setPassword(e.target.value)}
           required
         />
-        <button type="submit" className="w-full bg-[#10B981] hover:bg-[#059669] text-white font-bold py-2 rounded transition">
-          Sign Up
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#10B981] hover:bg-[#059669] text-white font-bold py-2 rounded transition"
+        >
+          {loading ? "Creating account..." : "Sign Up"}
         </button>
+
         <p className="text-gray-400 mt-4 text-center">
-          Already have an account? <Link to="/login" className="text-[#FCD34D]">Login</Link>
+          Already have an account?{" "}
+          <Link to="/login" className="text-[#FCD34D]">
+            Login
+          </Link>
         </p>
       </form>
     </div>

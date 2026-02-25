@@ -5,32 +5,59 @@ const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
+
     try {
-      const response = await fetch("https://rainfall-predict-backend.onrender.com/login", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await response.json();
-      if (data.success) {
-        onLogin(email); // Use the handler from App.js to update auth state and navigate
-      } else {
-        setError(data.message || 'Login failed.');
+      const response = await fetch(
+        "https://rainfall-predict-backend.onrender.com/login",
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        }
+      );
+
+      // If server is sleeping or not ready
+      if (!response.ok) {
+        throw new Error("Server not ready");
       }
+
+      const data = await response.json();
+
+      if (data.success) {
+        onLogin(email);
+      } else {
+        setError(data.message || 'Invalid email or password.');
+      }
+
     } catch (err) {
-      setError('Server error. Please try again later.');
+      setError(
+        "⚠ Server is starting up. Please wait 20–30 seconds and try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0F172A]">
-      <form onSubmit={handleSubmit} className="bg-[#1E293B] p-8 rounded-xl shadow-lg w-full max-w-sm">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-[#1E293B] p-8 rounded-xl shadow-lg w-full max-w-sm"
+      >
         <h2 className="text-2xl font-bold text-white mb-6">Login</h2>
-        {error && <div className="text-red-400 mb-2">{error}</div>}
+
+        {error && (
+          <div className="text-yellow-400 mb-4 text-sm">
+            {error}
+          </div>
+        )}
+
         <input
           type="email"
           placeholder="Email"
@@ -39,6 +66,7 @@ const Login = ({ onLogin }) => {
           onChange={e => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           placeholder="Password"
@@ -47,11 +75,20 @@ const Login = ({ onLogin }) => {
           onChange={e => setPassword(e.target.value)}
           required
         />
-        <button type="submit" className="w-full bg-[#10B981] hover:bg-[#059669] text-white font-bold py-2 rounded transition">
-          Login
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#10B981] hover:bg-[#059669] text-white font-bold py-2 rounded transition"
+        >
+          {loading ? "Checking server..." : "Login"}
         </button>
+
         <p className="text-gray-400 mt-4 text-center">
-          Don't have an account? <Link to="/signup" className="text-[#FCD34D]">Sign Up</Link>
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-[#FCD34D]">
+            Sign Up
+          </Link>
         </p>
       </form>
     </div>
